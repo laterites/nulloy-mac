@@ -15,6 +15,8 @@
 
 #include "actionManager.h"
 
+#include <QActionGroup>
+
 #include "action.h"
 #include "coverWidget.h"
 #include "mainWindow.h"

@@ -19,6 +19,7 @@
 #include <QFile>
 #include <QLabel>
 #include <QPushButton>
+#include <QRegularExpression>
 #include <QSpacerItem>
 #include <QSvgWidget>
 #include <QTabWidget>
@@ -105,7 +106,7 @@ NAboutDialog::NAboutDialog(QWidget *parent) : QDialog(parent)
     thanksFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream thanksStream(&thanksFile);
     QString thanksText = thanksStream.readAll();
-    thanksText.replace(QRegExp("(\\w)\\n(\\w)"), "\\1 \\2");
+    thanksText.replace(QRegularExpression("(\\w)\\n(\\w)"), "\\1 \\2");
     thanksText.remove("\n\n\n");
     thanksFile.close();
 
@@ -127,7 +128,7 @@ NAboutDialog::NAboutDialog(QWidget *parent) : QDialog(parent)
     QTextStream changelogStream(&changelogFile);
     QString changelogHtml = changelogStream.readAll();
     changelogHtml.replace("\n", "<br>\n");
-    changelogHtml.replace(QRegExp("(\\*[^<]*)(<br>)"), "<b>\\1</b>\\2");
+    changelogHtml.replace(QRegularExpression("(\\*[^<]*)(<br>)"), "<b>\\1</b>\\2");
     changelogFile.close();
 
     QTextBrowser *changelogTextBrowser = new QTextBrowser;

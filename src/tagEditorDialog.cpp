@@ -27,6 +27,7 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QMetaEnum>
+#include <QTextCodec>
 #include <QPushButton>
 #include <QTextEdit>
 

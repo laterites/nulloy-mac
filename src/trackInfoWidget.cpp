@@ -105,7 +105,11 @@ void NTrackInfoWidget::setTrackInfoReader(NTrackInfoReader *reader)
     m_trackInfoReader = reader;
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void NTrackInfoWidget::enterEvent(QEnterEvent *)
+#else
 void NTrackInfoWidget::enterEvent(QEvent *)
+#endif
 {
 #ifndef Q_OS_MAC // QTBUG-15367
     m_animation->setDirection(QAbstractAnimation::Forward);

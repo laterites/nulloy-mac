@@ -21,6 +21,7 @@
 #include <QPointer>
 
 #include "global.h"
+#include "playlistDataItem.h"
 
 class NPlaylistDataItem;
 class NPlaylistWidgetItem;
@@ -30,7 +31,6 @@ class QContextMenuEvent;
 class QDropEvent;
 class QMenu;
 class QString;
-class QStringList;
 
 class NPlaylistWidget : public QListWidget
 {
@@ -139,7 +139,11 @@ private:
     bool m_fileDrop;
     QList<QUrl> m_mimeDataUrls;
     QStringList mimeTypes() const;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QMimeData *mimeData(const QList<QListWidgetItem *> &items) const;
+#else
     QMimeData *mimeData(const QList<QListWidgetItem *> items) const;
+#endif
     bool dropMimeData(int index, const QMimeData *data, Qt::DropAction action);
 
 protected:
