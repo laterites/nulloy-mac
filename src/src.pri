@@ -75,6 +75,16 @@ unix:!mac:PKGCONFIG += x11
 
 no-update-check:DEFINES += _N_NO_UPDATE_CHECK_
 
+# skins and translations shipped inside the bundle, see migrateUserData() in main.cpp
+mac {
+    for(skin, SKINS):N_BUNDLED_DATA += skins/$${skin}.nzs
+    for(ts, $$list($$files($$SRC_DIR/i18n/*.ts))) {
+        _qm = $$basename(ts)
+        N_BUNDLED_DATA += i18n/$$replace(_qm, \\.ts$, .qm)
+    }
+    DEFINES += N_BUNDLED_DATA=\""\\\"$$join(N_BUNDLED_DATA, ",")\\\""\"
+}
+
 include(version.pri)
 DEFINES += _N_VERSION_=\""\\\"$${N_VERSION}\\\""\"
 build_pass:CONFIG(static, static|shared) {

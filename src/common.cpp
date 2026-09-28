@@ -24,6 +24,10 @@
 #include <QSettings>
 #endif
 
+#ifdef Q_OS_MAC
+#include <QStandardPaths>
+#endif
+
 namespace NCore
 {
     static QList<QByteArray> _argList;
@@ -71,7 +75,11 @@ QString NCore::settingsPath()
 QString NCore::rcDir()
 {
     if (!_rcDir_init) {
-#ifndef Q_OS_WIN
+#if defined(Q_OS_MAC)
+        // keep the application bundle read-only
+        _rcDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir().mkpath(_rcDir);
+#elif !defined(Q_OS_WIN)
         QDir parentDir(QCoreApplication::applicationDirPath());
         if (parentDir.dirName() == "bin") {
             _rcDir = QDir::homePath() + "/.nulloy";

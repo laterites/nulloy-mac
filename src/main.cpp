@@ -19,6 +19,9 @@
 #include "player.h"
 #include "settings.h"
 
+#include <QDir>
+#include <QSet>
+
 #if !defined(_N_NO_SKINS_) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include "skinFileSystem.h"
 Q_IMPORT_PLUGIN(NWidgetCollection)
@@ -91,6 +94,69 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     }
 }
 
+#ifdef Q_OS_MAC
+static bool _copyRecursively(const QString &src, const QString &dst)
+{
+    if (!QFileInfo(src).isDir()) {
+        return QDir().mkpath(QFileInfo(dst).absolutePath()) && QFile::copy(src, dst);
+    }
+    if (!QDir().mkpath(dst)) {
+        return false;
+    }
+    foreach (const QFileInfo &entry,
+             QDir(src).entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot)) {
+        if (!_copyRecursively(entry.absoluteFilePath(), dst + "/" + entry.fileName())) {
+            return false;
+        }
+    }
+    return true;
+}
+
+static void migrateUserData()
+{
+    // Nulloy used to keep user data inside the bundle, next to the executable.
+    // Copy it once; the bundle copy is left untouched.
+    QString oldDir = QCoreApplication::applicationDirPath();
+    QString newDir = NCore::rcDir();
+    if (QDir(oldDir) == QDir(newDir)) {
+        return;
+    }
+
+    QString base = NCore::applicationBinaryName();
+    QStringList names;
+    names << base + ".cfg" << base + ".m3u" << base + ".peaks";
+
+    // skins and translations shipped with the bundle are not user data
+    QSet<QString> bundled;
+    foreach (const QString &name, QString(N_BUNDLED_DATA).split(',')) {
+        bundled << name;
+    }
+    foreach (const QString &subDir, QStringList() << "skins" << "i18n") {
+        foreach (const QFileInfo &entry, QDir(oldDir + "/" + subDir)
+                                             .entryInfoList(QDir::Files | QDir::Dirs |
+                                                            QDir::NoDotAndDotDot)) {
+            QString name = subDir + "/" + entry.fileName();
+            if (!bundled.contains(name)) {
+                names << name;
+            }
+        }
+    }
+
+    foreach (const QString &name, names) {
+        QString src = oldDir + "/" + name;
+        QString dst = newDir + "/" + name;
+        if (!QFileInfo::exists(src) || QFileInfo::exists(dst)) {
+            continue;
+        }
+        if (_copyRecursively(src, dst)) {
+            qDebug() << "migrated" << src << "to" << dst;
+        } else {
+            qWarning() << "failed to migrate" << src << "to" << dst;
+        }
+    }
+}
+#endif
+
 int main(int argc, char *argv[])
 {
     // for Qt core plugins
@@ -120,6 +186,9 @@ int main(int argc, char *argv[])
     instance.setApplicationVersion(QString(_N_VERSION_));
     instance.setOrganizationDomain("nulloy.com");
     instance.setQuitOnLastWindowClosed(false);
+#ifdef Q_OS_MAC
+    migrateUserData();
+#endif
 
     qInstallMessageHandler(messageHandler);
 
