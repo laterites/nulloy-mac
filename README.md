@@ -1,3 +1,57 @@
+# Nulloy Mac
+
+This is a fork of [Nulloy](https://github.com/nulloy/nulloy), the music player
+with a waveform seekbar by Sergey Vlasov, maintained for macOS on Apple Silicon.
+
+## What is different from upstream
+
+* Ported to **Qt 6**: QtScript was replaced with QJSEngine, and the skin loader
+  now uses public Qt APIs. All bundled skins (Slim, Silver, Metro, Native)
+  work, including waveform colours set via `qproperty` in skin CSS. Based on
+  the Qt 6 work in [Auda29/nulloy](https://github.com/Auda29/nulloy).
+* **Native arm64 build**: no Rosetta needed. Qt is bundled inside
+  `Nulloy Mac.app`.
+* **User data lives in `~/Library/Application Support/Nulloy`**: settings,
+  playlist, waveform cache, and your own skins and translations. The app bundle
+  is no longer modified at runtime. Data from older versions that kept it
+  inside the bundle is copied over on first launch.
+* Own bundle identifier (`io.github.laterites.nulloy-mac`) and the name
+  "Nulloy Mac", so macOS does not confuse it with the original Nulloy.
+* Unicode tag fixes in the TagLib plugin.
+
+## Requirements
+
+* macOS on Apple Silicon (arm64)
+* [Homebrew](https://brew.sh) with GStreamer and TagLib (they are not bundled):
+
+  ```sh
+  brew install gstreamer taglib
+  ```
+
+## Installation
+
+Download the zip from [Releases](https://github.com/laterites/nulloy-mac/releases),
+unpack it and move `Nulloy Mac.app` to `/Applications`.
+
+The app is not signed with an Apple Developer ID, so macOS quarantines it after
+download and refuses to open it. Before the first launch, remove the quarantine
+attribute:
+
+```sh
+xattr -dr com.apple.quarantine "/Applications/Nulloy Mac.app"
+```
+
+## Building
+
+See [BUILD-macOS.md](BUILD-macOS.md) (in Russian).
+
+## License
+
+GPL-3.0, same as upstream Nulloy. See [LICENSE.GPL3](LICENSE.GPL3).
+The upstream README follows below.
+
+---
+
 # Nulloy Music Player
 
 ![Screenshot](http://nulloy.com/files/screen.png)
