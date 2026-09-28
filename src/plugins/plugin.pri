@@ -1,5 +1,10 @@
 TEMPLATE = lib
 CONFIG += plugin
+greaterThan(QT_MAJOR_VERSION, 5) {
+    QT += core5compat
+    # Q_ENUM_NS in global.h needs the N namespace meta-object inside each plugin
+    HEADERS += $$SRC_DIR/global.h
+}
 
 INCLUDEPATH += $$SRC_DIR $$SRC_DIR/interfaces $$SRC_DIR/plugins
 

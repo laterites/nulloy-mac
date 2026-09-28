@@ -1,4 +1,4 @@
 win32:include(../platform/winIcon.pri)
-SOURCES += *.cpp
-HEADERS += *.h
+SOURCES += $$files(*.cpp)
+HEADERS += $$files(*.h)
 INCLUDEPATH += .. ../interfaces

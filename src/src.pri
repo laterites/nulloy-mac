@@ -1,8 +1,12 @@
-QT += script gui svg core-private
+greaterThan(QT_MAJOR_VERSION, 5) {
+    QT += gui svg svgwidgets widgets network qml core5compat
+} else {
+    QT += script gui svg core-private
+}
 
 INCLUDEPATH += $$SRC_DIR $$SRC_DIR/interfaces
 
-HEADERS += $$SRC_DIR/*.h
+HEADERS += $$files($$SRC_DIR/*.h)
 SOURCES += $$files($$SRC_DIR/*.cpp)
 SOURCES -= $$SRC_DIR/main.cpp
 
@@ -35,12 +39,24 @@ unix:!mac:PKGCONFIG += x11
 !no-skins {
     include($$SRC_DIR/skins/skins.pri)
     QT += uitools
+    greaterThan(QT_MAJOR_VERSION, 5) {
+        # QtScript and private file engines are gone in Qt 6: use QJSEngine and public APIs
+        HEADERS -= $$SRC_DIR/scriptQtPrototypes.h $$SRC_DIR/skinFileSystem.h
+        SOURCES -= $$SRC_DIR/scriptEngine.cpp $$SRC_DIR/scriptQtPrototypes.cpp \
+                   $$SRC_DIR/skinFileSystem.cpp $$SRC_DIR/skinLoader.cpp
+        HEADERS += $$files($$SRC_DIR/qt6/*.h)
+        SOURCES += $$files($$SRC_DIR/qt6/*.cpp)
+    }
     INCLUDEPATH += $$SRC_DIR/widgetCollection
     LIBS += -L$$SRC_DIR/widgetCollection -lwidget_collection
     PRE_TARGETDEPS += $$SRC_DIR/widgetCollection/libwidget_collection.a
     RESOURCES += $$SRC_DIR/native-skin-embedded.qrc
 } else {
     DEFINES += _N_NO_SKINS_
+    greaterThan(QT_MAJOR_VERSION, 5) {
+        HEADERS -= $$SRC_DIR/scriptEngine.h $$SRC_DIR/scriptQtPrototypes.h
+        SOURCES -= $$SRC_DIR/scriptEngine.cpp $$SRC_DIR/scriptQtPrototypes.cpp
+    }
 
     HEADERS -= $$SRC_DIR/skinFileSystem.h   $$SRC_DIR/skinLoader.h
     SOURCES -= $$SRC_DIR/skinFileSystem.cpp $$SRC_DIR/skinLoader.cpp
