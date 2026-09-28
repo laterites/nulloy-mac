@@ -19,7 +19,7 @@
 #include "player.h"
 #include "settings.h"
 
-#ifndef _N_NO_SKINS_
+#if !defined(_N_NO_SKINS_) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include "skinFileSystem.h"
 Q_IMPORT_PLUGIN(NWidgetCollection)
 #endif
@@ -86,7 +86,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
         stream << QString("%1 %2: %3")
                       .arg(QTime::currentTime().toString("hh:mm:ss.zzz"), prefix,
                            msg.toLocal8Bit().constData())
-               << endl;
+               << Qt::endl;
         logFile.close();
     }
 }
@@ -100,10 +100,12 @@ int main(int argc, char *argv[])
     QCoreApplication::addLibraryPath(QFileInfo(argv[0]).dir().path() + "/plugins/");
 #endif
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
 
-#ifdef Q_OS_MAC
+#if defined(Q_OS_MAC) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     // https://bugreports.qt-project.org/browse/QTBUG-32789
     if (QSysInfo::MacintoshVersion > QSysInfo::MV_10_8)
         QFont::insertSubstitution(".Lucida Grande UI", "Lucida Grande");
@@ -165,7 +167,7 @@ int main(int argc, char *argv[])
         }
     }
 
-#ifndef _N_NO_SKINS_
+#if !defined(_N_NO_SKINS_) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     NSkinFileSystem::init();
 #endif
 
