@@ -264,7 +264,10 @@ QString NTagReaderTaglib::tagToKey(N::Tag tag) const
             return "URL";
         case N::DateTag:
             return "DATE";
+        case N::UnknownTag:
+            break;
     }
+    return QString();
 }
 
 QMap<QString, QStringList>
