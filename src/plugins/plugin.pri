@@ -21,7 +21,7 @@ unix:!mac {
 
 mac {
     xcode_override.name = "CONFIGURATION_BUILD_DIR"
-    xcode_override.value = $$TMP_DIR/$${APP_NAME}.app/Contents/MacOS/plugins
+    xcode_override.value = $$TMP_DIR/$$join(MAC_BUNDLE_NAME, " ").app/Contents/MacOS/plugins
     QMAKE_MAC_XCODE_SETTINGS += xcode_override
-    DESTDIR = $$PROJECT_DIR/$${APP_NAME}.app/Contents/MacOS/plugins
+    DESTDIR = $$PROJECT_DIR/$$join(MAC_BUNDLE_NAME, " ").app/Contents/MacOS/plugins
 }

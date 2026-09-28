@@ -1,14 +1,14 @@
 unix:SKIN_DEST_DIR = $$PROJECT_DIR/skins
-mac:SKIN_DEST_DIR = $$PROJECT_DIR/$${APP_NAME}.app/Contents/MacOS/skins
+mac:SKIN_DEST_DIR = $$macBundleDir()/Contents/MacOS/skins
 win32:SKIN_DEST_DIR = $$PROJECT_DIR/Skins
-system($$QMAKE_MKDIR $$fixSlashes($$SKIN_DEST_DIR))
+system($$QMAKE_MKDIR $$shell_quote($$fixSlashes($$SKIN_DEST_DIR)))
 
 unix:SKINS =  metro silver slim
 win32:SKINS = Metro Silver Slim
 for(skin, SKINS) {
     _depends = $$SRC_DIR/skins/$$lower($${skin})
     _target = $$SKIN_DEST_DIR/$${skin}.nzs
-    _commands = zip -j -X -x\*design.svg $$_target $$_depends/*
+    _commands = zip -j -X -x\*design.svg $$shell_quote($$_target) $$_depends/*
     win32:!unix_mingw:_commands = 7z a -tzip -w$$_depends -x\!design.svg $$_target $$_depends/*
     eval($${skin}.depends = $$_depends/*)
     eval($${skin}.target = $$_target)

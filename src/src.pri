@@ -123,6 +123,10 @@ system(cp $$SRC_DIR/icons/icon.rc $$TMP_DIR/)
 win32:RC_FILE = $$TMP_DIR/icon.rc
 
 mac {
+    QMAKE_APPLICATION_BUNDLE_NAME = $$join(MAC_BUNDLE_NAME, " ")
+    QMAKE_INFO_PLIST = $$SRC_DIR/platform/Info.plist.in
+    VERSION = $$N_VERSION
+
     system($$QMAKE_MKDIR $$TMP_DIR/icon.iconset)
     SIZES = 16 32 128 256
     for(size, SIZES) {

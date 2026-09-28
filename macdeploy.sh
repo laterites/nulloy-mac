@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Makes nulloy.app independent of the Qt installation it was built with:
+# Makes "Nulloy Mac.app" independent of the Qt installation it was built with:
 # copies Qt frameworks and plugins into the bundle using macdeployqt.
 #
 # GStreamer and TagLib are NOT bundled: GStreamer loads its plugins from
@@ -8,12 +8,12 @@
 # bundle would clash with them. Nulloy plugins keep linking them from
 # where they were found at build time.
 #
-# Usage: ./macdeploy.sh [path/to/nulloy.app]
+# Usage: ./macdeploy.sh ["path/to/Nulloy Mac.app"]
 #        MACDEPLOYQT=/path/to/macdeployqt ./macdeploy.sh
 
 set -eu
 
-APP="${1:-$(dirname "$0")/nulloy.app}"
+APP="${1:-$(dirname "$0")/Nulloy Mac.app}"
 MACDEPLOYQT="${MACDEPLOYQT:-macdeployqt}"
 
 APP="$(cd "$APP" && pwd)"
@@ -89,7 +89,7 @@ for plugin in "$N_PLUGINS"/*.dylib; do
 done
 
 # 6. Ad-hoc sign every Mach-O (required on Apple Silicon). The bundle itself
-#    is not sealed: Nulloy keeps data files (skins, i18n, settings) in
+#    is not sealed: Nulloy ships skins and translations in
 #    Contents/MacOS, which codesign rejects. The main executable is signed
 #    outside the bundle for the same reason.
 macho_files | while read -r f; do

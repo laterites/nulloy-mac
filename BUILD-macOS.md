@@ -1,7 +1,7 @@
 # Сборка Nulloy на macOS (Apple Silicon, Qt 6)
 
 Нативная arm64-сборка с Qt 6 из Homebrew. Система сборки — qmake
-(`./configure` + `make`), Qt упаковывается внутрь `nulloy.app`.
+(`./configure` + `make`), Qt упаковывается внутрь `Nulloy Mac.app`.
 
 ## Что нужно
 
@@ -9,7 +9,7 @@
 
 Пакеты Homebrew:
 
-| Пакет         | Зачем                                                        | Нужен для работы `nulloy.app`? |
+| Пакет         | Зачем                                                        | Нужен для работы `Nulloy Mac.app`? |
 |---------------|--------------------------------------------------------------|--------------------------------|
 | `qt`          | Qt 6: qmake, moc, lrelease, macdeployqt, фреймворки          | нет, после `./macdeploy.sh` Qt лежит в бандле |
 | `gstreamer`   | воспроизведение и построение waveform (плагин GStreamer)     | **да**, грузится из Homebrew   |
@@ -28,8 +28,8 @@ Qt 5 (`qt@5`) для сборки не нужен.
 ```sh
 ./configure
 make -j8
-./macdeploy.sh    # упаковать Qt внутрь nulloy.app
-open nulloy.app
+./macdeploy.sh    # упаковать Qt внутрь Nulloy Mac.app
+open "Nulloy Mac.app"
 ```
 
 `./configure` берёт `qmake` из `PATH`. Другой Qt можно указать явно:
@@ -39,7 +39,7 @@ open nulloy.app
 удалите их, иначе `make` соберёт проект старым Qt:
 
 ```sh
-rm -rf tmp nulloy.app .qmake.stash Makefile src/Makefile \
+rm -rf tmp "Nulloy Mac.app" .qmake.stash Makefile src/Makefile \
        src/widgetCollection/Makefile src/plugins/*/Makefile
 ```
 
@@ -48,13 +48,21 @@ rm -rf tmp nulloy.app .qmake.stash Makefile src/Makefile \
 Homebrew, и вторая копия libgstreamer внутри бандла конфликтовала бы с ними.
 После каждого `make` скрипт нужно запускать заново.
 
+Бандл называется `Nulloy Mac.app` (bundle identifier
+`io.github.laterites.nulloy-mac`, имя в Dock и меню — «Nulloy Mac»), чтобы
+macOS не путала его с оригинальным Nulloy. Исполняемый файл внутри по-прежнему
+`Contents/MacOS/nulloy`. Имя бандла задаётся в `configure`
+(`MAC_BUNDLE_NAME`), остальные ключи — в `src/platform/Info.plist.in`.
+qmake не пересоздаёт `Contents/Info.plist` после правки шаблона: удалите
+этот файл из бандла перед `make`.
+
 Пользовательские данные (настройки, плейлист, кэш waveform, свои skins и
-переводы) хранятся в `~/Library/Application Support/Nulloy`, бандл во время
-работы не изменяется.
+переводы) хранятся в `~/Library/Application Support/Nulloy` — так же, как до
+переименования. Бандл во время работы не изменяется.
 
 ## Когда разработка закончена
 
-Пакеты, нужные только для сборки, можно удалить. `nulloy.app` продолжит
+Пакеты, нужные только для сборки, можно удалить. `Nulloy Mac.app` продолжит
 работать, если он упакован через `./macdeploy.sh`.
 
 ```sh

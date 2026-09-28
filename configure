@@ -177,6 +177,8 @@ if [[ $XCODE == "yes" ]]; then
 fi
 
 echo "APP_NAME = $APP_NAME" >> $QMAKE_CACHE
+# macOS application bundle name, the executable inside stays $APP_NAME
+echo "MAC_BUNDLE_NAME = Nulloy Mac" >> $QMAKE_CACHE
 
 echo
 if [[ $FORCE_VERSION != "no" ]]; then
