@@ -11,3 +11,6 @@ PKGCONFIG += taglib
 HEADERS += $$files(*.h)
 SOURCES += $$files(*.cpp)
 
+
+# TagLib bundled into Frameworks/ by macdeploy.sh
+mac:QMAKE_LFLAGS += -Wl,-rpath,@loader_path/../../Frameworks

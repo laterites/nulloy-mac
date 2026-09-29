@@ -24,7 +24,9 @@
 
 NContainerGstreamer::NContainerGstreamer(QObject *parent) : QObject(parent)
 {
+#ifndef Q_OS_MAC // set up in main() on macOS
     qputenv("GST_REGISTRY", QString("%1/gstreamer-1.0.registry.bin").arg(NCore::rcDir()).toUtf8());
+#endif
 
     m_plugins << new NPlaybackEngineGStreamer()
 #ifdef _N_GSTREAMER_TAGREADER_PLUGIN_

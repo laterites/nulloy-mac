@@ -157,6 +157,35 @@ static void migrateUserData()
 }
 #endif
 
+#ifdef Q_OS_MAC
+static void setupGStreamerEnvironment()
+{
+    qputenv("GST_REGISTRY_1_0",
+            QFile::encodeName(NCore::rcDir() + "/gstreamer-1.0.registry.bin"));
+
+    // GStreamer bundled by macdeploy.sh; a build that has not been deployed
+    // keeps using the GStreamer it was linked against
+    QDir gstDir(QCoreApplication::applicationDirPath() + "/../Frameworks/GStreamer");
+    if (!gstDir.exists("lib/gstreamer-1.0")) {
+        return;
+    }
+
+    // only the bundled plugins, never Homebrew, /Library/Frameworks or ~/.local
+    qputenv("GST_PLUGIN_SYSTEM_PATH_1_0",
+            QFile::encodeName(gstDir.canonicalPath() + "/lib/gstreamer-1.0"));
+    qputenv("GST_PLUGIN_SCANNER_1_0",
+            QFile::encodeName(gstDir.canonicalPath() +
+                              "/libexec/gstreamer-1.0/gst-plugin-scanner"));
+    const char *unused[] = {"GST_PLUGIN_PATH", "GST_PLUGIN_PATH_1_0", "GST_PLUGIN_SYSTEM_PATH",
+                            "GST_PLUGIN_SCANNER"};
+    for (const char *name : unused) {
+        qunsetenv(name);
+    }
+    // no GIO modules from the build machine's GStreamer.framework
+    qputenv("GIO_MODULE_DIR", QFile::encodeName(gstDir.canonicalPath() + "/lib/gio/modules"));
+}
+#endif
+
 int main(int argc, char *argv[])
 {
     // for Qt core plugins
@@ -188,6 +217,7 @@ int main(int argc, char *argv[])
     instance.setQuitOnLastWindowClosed(false);
 #ifdef Q_OS_MAC
     migrateUserData();
+    setupGStreamerEnvironment();
 #endif
 
     qInstallMessageHandler(messageHandler);

@@ -17,3 +17,7 @@ gstreamer-tagreader {
     SOURCES -= tagReaderGstreamer.cpp
 }
 
+
+# GStreamer bundled by macdeploy.sh. Must be the only bundle rpath: Frameworks/
+# holds another libglib (Qt's dependency) that GStreamer must not pick up.
+mac:QMAKE_LFLAGS += -Wl,-rpath,@loader_path/../../Frameworks/GStreamer/lib

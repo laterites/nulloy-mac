@@ -131,7 +131,15 @@ check_executable QMAKE qmake
 check_executable LRELEASE lrelease
 echo "LRELEASE = $LRELEASE" >> $QMAKE_CACHE
 check_executable PKG_CONFIG pkg-config
-echo "PKG_CONFIG = $PKG_CONFIG" >> $QMAKE_CACHE
+# macOS: prefer the official GStreamer.framework, it is bundled by macdeploy.sh
+GSTREAMER_FRAMEWORK=${GSTREAMER_FRAMEWORK:-/Library/Frameworks/GStreamer.framework/Versions/1.0}
+if [[ $(uname) == Darwin && $BUILD_GSTREAMER == yes && -d "$GSTREAMER_FRAMEWORK/lib/pkgconfig" ]]; then
+    echo "using GStreamer framework: $GSTREAMER_FRAMEWORK"
+    export PKG_CONFIG_PATH="$GSTREAMER_FRAMEWORK/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}"
+    echo "PKG_CONFIG = env PKG_CONFIG_PATH=$PKG_CONFIG_PATH $PKG_CONFIG" >> $QMAKE_CACHE
+else
+    echo "PKG_CONFIG = $PKG_CONFIG" >> $QMAKE_CACHE
+fi
 
 [[ -n "$CFLAGS" ]]   && echo "QMAKE_CFLAGS += ${CFLAGS}"     >> $QMAKE_CACHE
 [[ -n "$CXXFLAGS" ]] && echo "QMAKE_CXXFLAGS += ${CXXFLAGS}" >> $QMAKE_CACHE
