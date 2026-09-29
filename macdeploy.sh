@@ -24,9 +24,12 @@ GST_PLUGINS="
     audioconvert audioresample volume
     audioparsers id3demux apetag
     wavparse aiff flac mpg123 ogg vorbis opus opusparse isomp4
+    wavpack asf
     libav
 "
-# libav: ALAC and AAC decoders (M4A); atdec from applemedia cannot decode ALAC
+# libav (FFmpeg): ALAC and AAC in M4A (applemedia's atdec cannot decode ALAC),
+# WMA decoders, and both demuxer and decoder for APE, TTA and Musepack.
+# wavpack: WavPack decoder (the parser is in audioparsers); asf: WMA demuxer.
 
 ARCH=arm64
 

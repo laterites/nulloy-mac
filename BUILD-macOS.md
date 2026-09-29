@@ -98,8 +98,12 @@ rm -rf tmp "Nulloy Mac.app" .qmake.stash Makefile src/Makefile \
   - `audioconvert`, `audioresample`, `volume`;
   - парсеры и теги: `audioparsers`, `id3demux`, `apetag`;
   - форматы: `wavparse`, `aiff`, `flac`, `mpg123`, `ogg`, `vorbis`, `opus`,
-    `opusparse`, `isomp4`;
-  - `libav` — декодеры ALAC и AAC для M4A.
+    `opusparse`, `isomp4`, `wavpack`, `asf` (WMA);
+  - `libav` (FFmpeg): ALAC и AAC в M4A, декодеры WMA, а также демультиплексоры
+    и декодеры APE, TTA и Musepack.
+
+  FFmpeg во фреймворке собран под LGPL-2.1-or-later (без GPL, version3 и
+  nonfree): это видно по `avcodec_license()` и `avcodec_configuration()`.
 
   Чтобы добавить формат, допишите плагин в `GST_PLUGINS`. Зависимости скрипт
   найдёт сам.

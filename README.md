@@ -12,7 +12,8 @@ with a waveform seekbar by Sergey Vlasov, maintained for macOS on Apple Silicon.
 * **Native arm64 build**: no Rosetta needed.
 * **Self-contained app**: Qt, GStreamer (from the official GStreamer.framework)
   and TagLib are bundled inside `Nulloy Mac.app`, so no Homebrew is needed.
-  Plays FLAC, WAV, MP3, Ogg Vorbis, Opus, AIFF and M4A (ALAC and AAC).
+  Plays FLAC, WAV, MP3, Ogg Vorbis, Opus, AIFF, M4A (ALAC and AAC), APE,
+  WavPack, WMA, TTA and Musepack.
 * **User data lives in `~/Library/Application Support/Nulloy`**: settings,
   playlist, waveform cache, and your own skins and translations. The app bundle
   is no longer modified at runtime. Data from older versions that kept it
@@ -48,9 +49,10 @@ See [BUILD-macOS.md](BUILD-macOS.md) (in Russian).
 GPL-3.0, same as upstream Nulloy. See [LICENSE.GPL3](LICENSE.GPL3).
 
 The app bundle also contains unmodified third-party libraries under their own
-licenses: Qt 6 (LGPL-3.0), GStreamer 1.28 and its plugins, including FFmpeg
-via gst-libav (LGPL-2.1+), and TagLib (LGPL-2.1 / MPL-1.1). Their sources
-are available from the respective projects.
+licenses: Qt 6 (LGPL-3.0), GStreamer 1.28 and its plugins (LGPL-2.1+),
+FFmpeg 7.1 via gst-libav (built as LGPL-2.1-or-later: no GPL, version3 or
+nonfree components), and TagLib (LGPL-2.1 / MPL-1.1). Their sources are
+available from the respective projects.
 
 The upstream README follows below.
 
