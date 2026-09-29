@@ -1,165 +1,170 @@
-# Сборка Nulloy на macOS (Apple Silicon, Qt 6)
+# Building Nulloy on macOS (Apple Silicon, Qt 6)
 
-Нативная arm64-сборка с Qt 6. Система сборки — qmake (`./configure` +
-`make`). `./macdeploy.sh` упаковывает внутрь `Nulloy Mac.app` Qt, TagLib и
-GStreamer, так что готовое приложение работает на Mac без Homebrew.
+**English** | [Русский](BUILD-macOS.ru.md)
 
-## Что нужно для сборки
+A native arm64 build with Qt 6. The build system is qmake (`./configure` +
+`make`). `./macdeploy.sh` bundles Qt, TagLib and GStreamer into
+`Nulloy Mac.app`, so the finished app runs on a Mac without Homebrew.
 
-Системное: Xcode или Command Line Tools, `zip`, `iconutil`.
+## Build requirements
 
-Пакеты Homebrew — ровно эти четыре, и только для сборки. Пользователю
-готового приложения Homebrew не нужен вообще.
+System: Xcode or the Command Line Tools, `zip`, `iconutil`.
 
-| Пакет         | Зачем                                                        |
-|---------------|--------------------------------------------------------------|
-| `qt`          | Qt 6: qmake, moc, lrelease, macdeployqt, фреймворки          |
-| `taglib`      | чтение и запись тегов (плагин TagLib), копируется в бандл    |
-| `pkgconf`     | `pkg-config` для поиска GStreamer и TagLib в `./configure`   |
-| `imagemagick` | `convert`: иконки приложения из SVG                          |
+Homebrew packages: exactly these four, and only for building. Users of the
+finished app do not need Homebrew at all.
+
+| Package       | Purpose                                                          |
+|---------------|------------------------------------------------------------------|
+| `qt`          | Qt 6: qmake, moc, lrelease, macdeployqt, frameworks              |
+| `taglib`      | reading and writing tags (TagLib plugin), copied into the bundle |
+| `pkgconf`     | `pkg-config`, used by `./configure` to find GStreamer and TagLib |
+| `imagemagick` | `convert`: app icons from SVG                                    |
 
 ```sh
 brew install qt taglib pkgconf imagemagick
 ```
 
-`brew install` помечает все четыре пакета как установленные явно, поэтому
-`brew autoremove` их не удалит, даже если они стояли раньше как зависимости
-других пакетов.
+`brew install` marks all four packages as installed on request, so
+`brew autoremove` will not remove them even if they were previously
+installed as dependencies of other packages.
 
-Для сборки **не нужны**: `gstreamer` из Homebrew (вместо него
-GStreamer.framework, см. ниже) и `qt@5`.
+**Not needed** for building: Homebrew's `gstreamer` (GStreamer.framework is
+used instead, see below) and `qt@5`.
 
 ### GStreamer.framework
 
-GStreamer берётся из официального фреймворка, не из Homebrew:
-https://gstreamer.freedesktop.org/download/ → macOS, пакеты runtime и
-development (universal). Проверено с версией 1.28.7.
+GStreamer comes from the official framework, not from Homebrew:
+https://gstreamer.freedesktop.org/download/ → macOS, the runtime and
+development packages (universal). Tested with version 1.28.7.
 
-Оба пакета ставятся в `/Library/Frameworks/GStreamer.framework`. Полный
-development-пакет занимает 4,7 ГБ, для Nulloy хватает его компонента
-«GStreamer 1.0 core» (≈ 2,3 ГБ, заголовки и `.pc`). Runtime занимает
-682 МБ.
+Both packages install into `/Library/Frameworks/GStreamer.framework`. The
+full development package takes 4.7 GB; Nulloy only needs its
+"GStreamer 1.0 core" component (≈ 2.3 GB, headers and `.pc` files). The
+runtime takes 682 MB.
 
 ```sh
 sudo installer -pkg gstreamer-1.0-1.28.7-universal.pkg -target /
 
-# development: только компонент core
+# development: the core component only
 installer -showChoicesXML -pkg gstreamer-1.0-devel-1.28.7-universal.pkg \
           -target / > choices.plist
-# в choices.plist снять выбор (attributeSetting = 0) со всех *-devel,
-# кроме gstreamer-1.0-core-devel, затем:
+# in choices.plist, deselect (attributeSetting = 0) every *-devel choice
+# except gstreamer-1.0-core-devel, then:
 sudo installer -pkg gstreamer-1.0-devel-1.28.7-universal.pkg \
      -applyChoiceChangesXML choices.plist -target /
 ```
 
-`./configure` сам находит фреймворк. Другой путь можно указать через
-`GSTREAMER_FRAMEWORK=/path/to/GStreamer.framework/Versions/1.0 ./configure`.
-Если фреймворка нет, используется GStreamer, который найдёт `pkg-config`
-(например, из Homebrew). Такая сборка работает, но `./macdeploy.sh` упаковать
-её не сможет.
+`./configure` finds the framework automatically. A different location can be
+set with `GSTREAMER_FRAMEWORK=/path/to/GStreamer.framework/Versions/1.0 ./configure`.
+Without the framework, the build uses whatever GStreamer `pkg-config` finds
+(for example Homebrew's). Such a build works, but `./macdeploy.sh` cannot
+bundle it.
 
-## Сборка
+## Building
 
 ```sh
 ./configure
 make -j8
-./macdeploy.sh    # упаковать Qt, TagLib и GStreamer внутрь Nulloy Mac.app
+./macdeploy.sh    # bundle Qt, TagLib and GStreamer into Nulloy Mac.app
 open "Nulloy Mac.app"
 ```
 
-Релизный архив:
+Release archive:
 
 ```sh
-ditto -c -k --keepParent "Nulloy Mac.app" Nulloy-Mac-<версия>-arm64.zip
+ditto -c -k --keepParent "Nulloy Mac.app" Nulloy-Mac-<version>-arm64.zip
 ```
 
-`./configure` берёт `qmake` из `PATH`. Другой Qt можно указать явно:
+`./configure` takes `qmake` from `PATH`. A different Qt can be set explicitly:
 `QMAKE=/opt/homebrew/opt/qt/bin/qmake ./configure`.
 
-Если в дереве остались Makefile'ы от прошлой сборки (другая версия Qt,
-другой GStreamer), сначала удалите их:
+If Makefiles from a previous build (another Qt version, another GStreamer)
+are still in the tree, remove them first:
 
 ```sh
 rm -rf tmp "Nulloy Mac.app" .qmake.stash Makefile src/Makefile \
        src/widgetCollection/Makefile src/plugins/*/Makefile
 ```
 
-После каждого `make` нужно снова запускать `./macdeploy.sh`.
+Run `./macdeploy.sh` again after every `make`.
 
-## Что делает macdeploy.sh
+## What macdeploy.sh does
 
-- **Qt:** `macdeployqt` копирует Qt 6 и его зависимости в
-  `Contents/Frameworks`. Лишние Qt-плагины (qpdf, виртуальная клавиатура)
-  удаляются.
-- **TagLib:** `libtag` копируется в `Contents/Frameworks`, плагин ссылается
-  на него через `@rpath`.
-- **GStreamer:** плагины из списка `GST_PLUGINS` в начале скрипта,
-  `gst-plugin-scanner` и все нужные им библиотеки копируются в
-  `Contents/Frameworks/GStreamer` в той же структуре, что во фреймворке
-  (`lib/`, `lib/gstreamer-1.0/`, `libexec/gstreamer-1.0/`). Отдельный каталог
-  нужен потому, что у GStreamer своя GLib с теми же именами файлов, что у
-  зависимостей Qt. Сейчас в списке:
-  - ядро: `coreelements`, `typefindfunctions`, `playback`, `autodetect`;
-  - вывод звука: `osxaudio`;
+- **Qt:** `macdeployqt` copies Qt 6 and its dependencies into
+  `Contents/Frameworks`. Unused Qt plugins (qpdf, virtual keyboard) are
+  removed.
+- **TagLib:** `libtag` is copied into `Contents/Frameworks`; the plugin links
+  it via `@rpath`.
+- **GStreamer:** the plugins listed in `GST_PLUGINS` at the top of the script,
+  `gst-plugin-scanner` and every library they need are copied into
+  `Contents/Frameworks/GStreamer`, keeping the framework layout (`lib/`,
+  `lib/gstreamer-1.0/`, `libexec/gstreamer-1.0/`). A separate directory is
+  needed because GStreamer ships its own GLib with the same file names as
+  Qt's dependencies. The current list:
+  - core: `coreelements`, `typefindfunctions`, `playback`, `autodetect`;
+  - audio output: `osxaudio`;
   - `audioconvert`, `audioresample`, `volume`;
-  - парсеры и теги: `audioparsers`, `id3demux`, `apetag`;
-  - форматы: `wavparse`, `aiff`, `flac`, `mpg123`, `ogg`, `vorbis`, `opus`,
+  - parsers and tags: `audioparsers`, `id3demux`, `apetag`;
+  - formats: `wavparse`, `aiff`, `flac`, `mpg123`, `ogg`, `vorbis`, `opus`,
     `opusparse`, `isomp4`, `wavpack`, `asf` (WMA);
-  - `libav` (FFmpeg): ALAC и AAC в M4A, декодеры WMA, а также демультиплексоры
-    и декодеры APE, TTA и Musepack.
+  - `libav` (FFmpeg): ALAC and AAC in M4A, the WMA decoders, and the
+    demuxers and decoders for APE, TTA and Musepack.
 
-  FFmpeg во фреймворке собран под LGPL-2.1-or-later (без GPL, version3 и
-  nonfree): это видно по `avcodec_license()` и `avcodec_configuration()`.
+  FFmpeg in the framework is built as LGPL-2.1-or-later (no GPL, version3 or
+  nonfree parts), as reported by `avcodec_license()` and
+  `avcodec_configuration()`.
 
-  Чтобы добавить формат, допишите плагин в `GST_PLUGINS`. Зависимости скрипт
-  найдёт сам.
-- **Архитектура:** universal-бинарники урезаются до arm64.
-- **Ссылки и подпись:** абсолютные rpath удаляются, каждый Mach-O
-  подписывается ad-hoc.
-- **Проверка:** в конце скрипт падает, если какой-то бинарник ссылается на
-  библиотеки вне бандла, кроме `/usr/lib` и `/System`.
+  To add a format, add its plugin to `GST_PLUGINS`; the script finds the
+  dependencies itself.
+- **Architecture:** universal binaries are thinned to arm64.
+- **Linking and signing:** absolute rpaths are removed, and every Mach-O file is
+  ad-hoc signed.
+- **Check:** at the end the script fails if any binary refers to a library
+  outside the bundle other than `/usr/lib` and `/System`.
 
-При запуске `main()` направляет GStreamer только на плагины и
-`gst-plugin-scanner` внутри бандла. Реестр плагинов хранится в
+At startup, `main()` points GStreamer only to the plugins and
+`gst-plugin-scanner` inside the bundle. The plugin registry is stored in
 `~/Library/Application Support/Nulloy/gstreamer-1.0.registry.bin`.
-GStreamer из Homebrew, `/Library/Frameworks` и `~/.local` не используется.
+GStreamer from Homebrew, `/Library/Frameworks` or `~/.local` is never used.
 
-## Имя и данные
+## Name and data
 
-Бандл называется `Nulloy Mac.app` (bundle identifier
-`io.github.laterites.nulloy-mac`, имя в Dock и меню — «Nulloy Mac»), чтобы
-macOS не путала его с оригинальным Nulloy. Исполняемый файл внутри по-прежнему
-`Contents/MacOS/nulloy`. Имя бандла задаётся в `configure`
-(`MAC_BUNDLE_NAME`), остальные ключи — в `src/platform/Info.plist.in`.
-qmake не пересоздаёт `Contents/Info.plist` после правки шаблона: удалите
-этот файл из бандла перед `make`.
+The bundle is called `Nulloy Mac.app` (bundle identifier
+`io.github.laterites.nulloy-mac`, shown as "Nulloy Mac" in the Dock and menu
+bar), so that macOS does not confuse it with the original Nulloy. The
+executable inside is still `Contents/MacOS/nulloy`. The bundle name is set in
+`configure` (`MAC_BUNDLE_NAME`), the other keys in
+`src/platform/Info.plist.in`. qmake does not regenerate `Contents/Info.plist`
+after the template changes: delete that file from the bundle before running
+`make`.
 
-Пользовательские данные (настройки, плейлист, кэш waveform, свои skins и
-переводы) хранятся в `~/Library/Application Support/Nulloy`. Бандл во время
-работы не изменяется.
+User data (settings, playlist, waveform cache, your own skins and
+translations) is stored in `~/Library/Application Support/Nulloy`. The bundle
+is not modified while the app is running.
 
-## Когда разработка закончена
+## When development is finished
 
-`Nulloy Mac.app` после `./macdeploy.sh` не зависит ни от Homebrew, ни от
-`/Library/Frameworks/GStreamer.framework`: всё нужное лежит внутри бандла.
+After `./macdeploy.sh`, `Nulloy Mac.app` depends neither on Homebrew nor on
+`/Library/Frameworks/GStreamer.framework`: everything it needs is inside the
+bundle.
 
-### Homebrew-овский gstreamer
+### Homebrew's gstreamer
 
-Он больше не нужен ни для сборки, ни для работы. `taglib` и `pkgconf` при
-этом нужны для сборки, а если они когда-то поставились как зависимости
-`gstreamer`, `brew autoremove` удалит их вместе с ним. Поэтому сначала
-пометьте их как установленные явно:
+It is no longer needed, neither for building nor for running. `taglib` and
+`pkgconf` are still needed for building, and if they were once installed as
+dependencies of `gstreamer`, `brew autoremove` would remove them together
+with it. So mark them as installed on request first:
 
 ```sh
-brew install taglib pkgconf   # пометить как нужные; уже установленные не переустанавливаются
+brew install taglib pkgconf   # mark as wanted; already installed packages are not reinstalled
 brew uninstall gstreamer
-brew autoremove --dry-run     # посмотреть, что будет удалено
+brew autoremove --dry-run     # see what would be removed
 brew autoremove
 ```
 
-### Инструменты сборки
+### Build tools
 
-Если Nulloy больше не нужно пересобирать, удалите пакеты для сборки:
+If you no longer need to rebuild Nulloy, remove the build packages:
 
 ```sh
 brew uninstall imagemagick qt taglib pkgconf
@@ -167,17 +172,17 @@ brew autoremove --dry-run
 brew autoremove
 ```
 
-Удалите из этого списка то, чем пользуются другие программы. Проверить это
-можно так: `brew uses --installed <пакет>`.
+Leave out anything other software still uses. You can check with
+`brew uses --installed <package>`.
 
 ### GStreamer.framework
 
-Установщик кладёт фреймворк в `/Library/Frameworks` и оставляет квитанции
-пакетов (`org.freedesktop.gstreamer.*`). Удаление:
+The installer puts the framework into `/Library/Frameworks` and leaves package
+receipts (`org.freedesktop.gstreamer.*`). To remove it:
 
 ```sh
 sudo rm -rf /Library/Frameworks/GStreamer.framework
 pkgutil --pkgs | grep '^org\.freedesktop\.gstreamer' | xargs -n1 sudo pkgutil --forget
 ```
 
-После этого пересобрать Nulloy можно, только установив фреймворк заново.
+After that, rebuilding Nulloy requires installing the framework again.

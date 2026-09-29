@@ -45,7 +45,8 @@ click Open Anyway.
 
 ## Building
 
-Full instructions: [BUILD-macOS.md](BUILD-macOS.md) (in Russian). In short:
+Full instructions: [BUILD-macOS.md](BUILD-macOS.md)
+([на русском](BUILD-macOS.ru.md)). In short:
 
 * Homebrew packages needed to build: `qt`, `taglib`, `pkgconf`, `imagemagick`.
   Homebrew's `gstreamer` and `qt@5` are not used.
