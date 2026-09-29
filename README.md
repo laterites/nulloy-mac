@@ -40,9 +40,27 @@ attribute:
 xattr -dr com.apple.quarantine "/Applications/Nulloy Mac.app"
 ```
 
+Or try to open the app, then go to System Settings → Privacy & Security and
+click Open Anyway.
+
 ## Building
 
-See [BUILD-macOS.md](BUILD-macOS.md) (in Russian).
+Full instructions: [BUILD-macOS.md](BUILD-macOS.md) (in Russian). In short:
+
+* Homebrew packages needed to build: `qt`, `taglib`, `pkgconf`, `imagemagick`.
+  Homebrew's `gstreamer` and `qt@5` are not used.
+* GStreamer comes from the official
+  [GStreamer.framework](https://gstreamer.freedesktop.org/download/) (runtime
+  and development packages, installed into `/Library/Frameworks`).
+* `./configure && make -j8 && ./macdeploy.sh` builds `Nulloy Mac.app` and copies
+  Qt, TagLib and GStreamer into it. The list of bundled GStreamer plugins is
+  at the top of `macdeploy.sh`.
+
+When you are done developing, the build tools can be removed:
+`brew uninstall imagemagick qt taglib pkgconf && brew autoremove`, and the
+framework with
+`sudo rm -rf /Library/Frameworks/GStreamer.framework` followed by
+`pkgutil --pkgs | grep '^org\.freedesktop\.gstreamer' | xargs -n1 sudo pkgutil --forget`.
 
 ## License
 
@@ -54,7 +72,9 @@ FFmpeg 7.1 via gst-libav (built as LGPL-2.1-or-later: no GPL, version3 or
 nonfree components), and TagLib (LGPL-2.1 / MPL-1.1). Their sources are
 available from the respective projects.
 
-The upstream README follows below.
+The upstream README follows below. Its Windows and Linux instructions are
+kept as they are (Qt 5) and are not tested in this fork; for macOS use
+[BUILD-macOS.md](BUILD-macOS.md).
 
 ---
 
@@ -135,65 +155,10 @@ Nulloy.exe
 <details>
 <summary>macOS</summary>
 
-### Prerequisites
-* Xcode Command Line Tools
-* MacPorts http://www.macports.org/ or HomeBrew https://brew.sh/
-
-### Environment
-
-Install Xcode Command Line Tools:
-
-```sh
-xcode-select --install
-```
-
-### Dependences
-
-First install either MacPorts or HomeBrew.
-
-### MacPorts
-
-After installing MacPorts:
-
-```sh
-sudo port install pkgconfig qt5 qt5-qtscript qt5-qttools gstreamer1 gstreamer1-gst-plugins-base taglib ImageMagick librsvg
-export PATH=/opt/local/libexec/qt5/bin:$PATH
-# install extra GStreamer plugins for more audio formats
-sudo port install gstreamer1-gst-plugins-good gstreamer1-gst-plugins-bad gstreamer1-gst-plugins-ugly
-
-cd nulloy.git
-./configure
-make
-open nulloy.app
-```
-
-### HomeBrew
-
-After installing HomeBrew:
-
-```sh
-brew install pkgconfig qt5 gstreamer gst-plugins-base taglib imagemagick librsvg
-export PATH=/usr/local/opt/qt/bin:$PATH
-# install extra GStreamer plugins for more audio formats
-brew install gst-plugins-good gst-plugins-bad gst-plugins-ugly
-
-cd nulloy.git
-./configure
-make
-open nulloy.app
-```
-
-### Xcode
-
-Generate Xcode project file:
-
-```sh
-cd nulloy.git
-./configure --xcode
-open nulloy.xcodeproj
-```
-Build `widget_collection`, `plugin_taglib` and `plugin_gstreamer` targets. It may take several attempts to build, but it should succeed eventually.
-Build and run `nulloy` target.
+This fork builds on macOS with Qt 6 and the official GStreamer.framework; the
+original Qt 5 / MacPorts / Homebrew GStreamer instructions no longer apply.
+See [BUILD-macOS.md](BUILD-macOS.md) and the "Building" section at the top of
+this file.
 </details>
 
 <details>

@@ -8,7 +8,8 @@ GStreamer, так что готовое приложение работает н
 
 Системное: Xcode или Command Line Tools, `zip`, `iconutil`.
 
-Пакеты Homebrew (только для сборки, пользователю приложения не нужны):
+Пакеты Homebrew — ровно эти четыре, и только для сборки. Пользователю
+готового приложения Homebrew не нужен вообще.
 
 | Пакет         | Зачем                                                        |
 |---------------|--------------------------------------------------------------|
@@ -21,7 +22,12 @@ GStreamer, так что готовое приложение работает н
 brew install qt taglib pkgconf imagemagick
 ```
 
-Qt 5 (`qt@5`) и `gstreamer` из Homebrew для сборки не нужны.
+`brew install` помечает все четыре пакета как установленные явно, поэтому
+`brew autoremove` их не удалит, даже если они стояли раньше как зависимости
+других пакетов.
+
+Для сборки **не нужны**: `gstreamer` из Homebrew (вместо него
+GStreamer.framework, см. ниже) и `qt@5`.
 
 ### GStreamer.framework
 
@@ -134,23 +140,44 @@ qmake не пересоздаёт `Contents/Info.plist` после правки 
 
 ## Когда разработка закончена
 
-`Nulloy Mac.app` после `./macdeploy.sh` ни от чего из этого не зависит.
-Инструменты сборки можно удалить:
+`Nulloy Mac.app` после `./macdeploy.sh` не зависит ни от Homebrew, ни от
+`/Library/Frameworks/GStreamer.framework`: всё нужное лежит внутри бандла.
+
+### Homebrew-овский gstreamer
+
+Он больше не нужен ни для сборки, ни для работы. `taglib` и `pkgconf` при
+этом нужны для сборки, а если они когда-то поставились как зависимости
+`gstreamer`, `brew autoremove` удалит их вместе с ним. Поэтому сначала
+пометьте их как установленные явно:
 
 ```sh
-brew uninstall imagemagick
-brew autoremove --dry-run   # посмотреть, что будет удалено
+brew install taglib pkgconf   # пометить как нужные; уже установленные не переустанавливаются
+brew uninstall gstreamer
+brew autoremove --dry-run     # посмотреть, что будет удалено
 brew autoremove
 ```
 
-`brew autoremove` удаляет только пакеты, которые были установлены как
-зависимости и больше никому не нужны. Если Nulloy больше не нужно
-пересобирать, так же можно удалить `qt`, `taglib` и `pkgconf`. Проверьте
-через `brew uses --installed <пакет>`, что они не нужны другим программам.
+### Инструменты сборки
 
-GStreamer.framework удаляется вручную:
+Если Nulloy больше не нужно пересобирать, удалите пакеты для сборки:
+
+```sh
+brew uninstall imagemagick qt taglib pkgconf
+brew autoremove --dry-run
+brew autoremove
+```
+
+Удалите из этого списка то, чем пользуются другие программы. Проверить это
+можно так: `brew uses --installed <пакет>`.
+
+### GStreamer.framework
+
+Установщик кладёт фреймворк в `/Library/Frameworks` и оставляет квитанции
+пакетов (`org.freedesktop.gstreamer.*`). Удаление:
 
 ```sh
 sudo rm -rf /Library/Frameworks/GStreamer.framework
-pkgutil --pkgs | grep org.freedesktop.gstreamer | xargs -n1 sudo pkgutil --forget
+pkgutil --pkgs | grep '^org\.freedesktop\.gstreamer' | xargs -n1 sudo pkgutil --forget
 ```
+
+После этого пересобрать Nulloy можно, только установив фреймворк заново.
