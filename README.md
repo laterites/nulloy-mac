@@ -3,6 +3,10 @@
 This is a fork of [Nulloy](https://github.com/nulloy/nulloy), the music player
 with a waveform seekbar by Sergey Vlasov, maintained for macOS on Apple Silicon.
 
+Current version: **Nulloy Mac 0.3.0, based on Nulloy 0.9.9.** Nulloy Mac has
+its own version numbering, independent of the original Nulloy; the About
+window shows both versions.
+
 ## What is different from upstream
 
 * Ported to **Qt 6**: QtScript was replaced with QJSEngine, and the skin loader

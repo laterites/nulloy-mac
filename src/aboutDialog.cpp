@@ -16,6 +16,7 @@
 #include "aboutDialog.h"
 
 #include <QCoreApplication>
+#include <QGuiApplication>
 #include <QFile>
 #include <QLabel>
 #include <QPushButton>
@@ -40,7 +41,7 @@ NAboutDialog::NAboutDialog(QWidget *parent) : QDialog(parent)
 #else
         "<span style=\"font-size:9pt;\">" +
 #endif
-            "<b>" +  QCoreApplication::applicationName() + " Music Player</b>" +
+            "<b>" +  QGuiApplication::applicationDisplayName() + " Music Player</b>" +
             "<br>" +
             "<a href='https://" + QCoreApplication::organizationDomain() + "'>https://" +
                                  QCoreApplication::organizationDomain() + "</a>" +
@@ -50,13 +51,19 @@ NAboutDialog::NAboutDialog(QWidget *parent) : QDialog(parent)
 #else
         "<span style=\"font-size:8pt;\">" +
 #endif
+#ifdef _N_MAC_VERSION_
+            tr("Version: ") + QGuiApplication::applicationDisplayName() + " " +
+                QCoreApplication::applicationVersion() +
+                ", based on Nulloy " + _N_VERSION_ +
+#else
             tr("Version: ") + QCoreApplication::applicationVersion() +
+#endif
             "<br><br>" +
             "Copyright (C) 2010-2024 Sergey Vlasov &lt;sergey@vlasov.me&gt;" +
         "</span>";
     // clang-format on
 
-    setWindowTitle(tr("About ") + QCoreApplication::applicationName());
+    setWindowTitle(tr("About ") + QGuiApplication::applicationDisplayName());
     setMaximumSize(0, 0);
 
     QVBoxLayout *layout = new QVBoxLayout;

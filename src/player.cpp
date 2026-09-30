@@ -59,6 +59,7 @@
 #endif
 
 #include <QFileDialog>
+#include <QGuiApplication>
 #include <QFileInfo>
 #include <QMenu>
 #include <QMessageBox>
@@ -165,7 +166,7 @@ NPlayer::NPlayer()
     connect(NMacDock::instance(), SIGNAL(clicked()), m_mainWindow, SLOT(show()));
 #endif
 
-    m_mainWindow->setTitle(QCoreApplication::applicationName() + " " +
+    m_mainWindow->setTitle(QGuiApplication::applicationDisplayName() + " " +
                            QCoreApplication::applicationVersion());
     m_mainWindow->show();
     m_mainWindow->loadSettings();

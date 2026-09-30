@@ -73,6 +73,8 @@ unix:!mac:PKGCONFIG += x11
     FORMS += $$SRC_DIR/skins/native/form.ui
 }
 
+# Nulloy Mac: the online check reports upstream Nulloy releases, not Nulloy Mac ones
+mac:CONFIG += no-update-check
 no-update-check:DEFINES += _N_NO_UPDATE_CHECK_
 
 # skins and translations shipped inside the bundle, see migrateUserData() in main.cpp
@@ -87,6 +89,7 @@ mac {
 
 include(version.pri)
 DEFINES += _N_VERSION_=\""\\\"$${N_VERSION}\\\""\"
+mac:DEFINES += _N_MAC_VERSION_=\""\\\"$${N_MAC_VERSION}\\\""\"
 build_pass:CONFIG(static, static|shared) {
     DEFINES += _N_STATIC_BUILD_
 } else {
@@ -125,7 +128,7 @@ win32:RC_FILE = $$TMP_DIR/icon.rc
 mac {
     QMAKE_APPLICATION_BUNDLE_NAME = $$join(MAC_BUNDLE_NAME, " ")
     QMAKE_INFO_PLIST = $$SRC_DIR/platform/Info.plist.in
-    VERSION = $$N_VERSION
+    VERSION = $$N_MAC_VERSION
 
     system($$QMAKE_MKDIR $$TMP_DIR/icon.iconset)
     SIZES = 16 32 128 256

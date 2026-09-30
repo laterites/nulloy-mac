@@ -82,7 +82,7 @@ NPreferencesDialog::NPreferencesDialog(NPlayer *player, QWidget *parent) : QDial
     connect(ui.customTrashCheckBox, SIGNAL(toggled(bool)), ui.customTrashCommandLineEdit,
             SLOT(setEnabled(bool)));
 
-    setWindowTitle(QCoreApplication::applicationName() + tr(" Preferences"));
+    setWindowTitle(QGuiApplication::applicationDisplayName() + tr(" Preferences"));
 
 #ifdef _N_NO_SKINS_
     ui.skinLabel->hide();

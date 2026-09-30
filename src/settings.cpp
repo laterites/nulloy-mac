@@ -93,7 +93,7 @@ NSettings::NSettings(QObject *parent)
 
     initValue("PlaylistTrackInfo", "%F{ (%d)}");
     initValue("WindowTitleTrackInfo",
-              "{\"%a - %t\" — |\"%F\" — }" + QCoreApplication::applicationName() + " %v");
+              "{\"%a - %t\" — |\"%F\" — }" + QGuiApplication::applicationDisplayName() + " %v");
     initValue("EncodingTrackInfo", "UTF-8");
     initValue("TooltipTrackInfo", "%C");
     initValue("TooltipOffset", QStringList() << QString::number(0) << QString::number(0));

@@ -17,6 +17,7 @@
 
 #include <QCheckBox>
 #include <QCoreApplication>
+#include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QMessageBox>
 #include <QPushButton>
@@ -48,7 +49,7 @@ NLogDialog::NLogDialog(QWidget *parent) : QDialog(parent)
     connect(closeButton, SIGNAL(clicked()), this, SLOT(close()));
     hLayout->addWidget(closeButton);
 
-    setWindowTitle(QCoreApplication::applicationName() + " Log");
+    setWindowTitle(QGuiApplication::applicationDisplayName() + " Log");
 
     setMinimumWidth(500);
 }

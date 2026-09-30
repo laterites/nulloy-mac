@@ -6,3 +6,6 @@ isEmpty(N_CONFIG_FORCE_VERSION) {
     N_VERSION = $$N_CONFIG_FORCE_VERSION
 }
 
+# Nulloy Mac has its own version numbering, independent of upstream Nulloy
+N_MAC_VERSION = 0.3.0
+

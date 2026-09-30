@@ -212,7 +212,15 @@ int main(int argc, char *argv[])
 
     QtSingleApplication instance(argc, argv);
     instance.setApplicationName("Nulloy");
+#ifdef Q_OS_MAC
+    // user-visible name; applicationName() stays "Nulloy" for the data directory
+    instance.setApplicationDisplayName("Nulloy Mac");
+#endif
+#ifdef _N_MAC_VERSION_
+    instance.setApplicationVersion(QString(_N_MAC_VERSION_));
+#else
     instance.setApplicationVersion(QString(_N_VERSION_));
+#endif
     instance.setOrganizationDomain("nulloy.com");
     instance.setQuitOnLastWindowClosed(false);
 #ifdef Q_OS_MAC
