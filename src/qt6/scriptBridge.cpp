@@ -4,6 +4,7 @@
 #include "scriptBridge.h"
 #include <QAbstractButton>
 #include <QBoxLayout>
+#include <QDebug>
 #include <QDialog>
 #include <QMouseEvent>
 #include <QMetaMethod>
@@ -102,7 +103,16 @@ void ObjectBridge::setSetting(QString key, QJSValue value)
 }
 int ObjectBridge::windowFlags() const { return widget() ? int(widget()->windowFlags()) : 0; }
 void ObjectBridge::setWindowFlags(int flags) { if (widget()) widget()->setWindowFlags(Qt::WindowFlags(flags)); }
-void ObjectBridge::setAttribute(int a, bool b) { if (widget()) widget()->setAttribute(Qt::WidgetAttribute(a), b); }
+void ObjectBridge::setAttribute(QJSValue a, bool b)
+{
+    // Attributes removed in Qt 6 (e.g. WA_MacBrushedMetal) arrive as undefined, which
+    // would otherwise convert to 0 == Qt::WA_Disabled and disable the whole widget.
+    if (!a.isNumber()) {
+        qWarning() << "setAttribute: unknown widget attribute" << a.toString();
+        return;
+    }
+    if (widget()) widget()->setAttribute(Qt::WidgetAttribute(a.toInt()), b);
+}
 QJSValue ObjectBridge::parentWidget() { return owner_->wrap(widget() ? widget()->parentWidget() : nullptr); }
 void ObjectBridge::move(int x, int y) { if (widget()) widget()->move(x, y); }
 void ObjectBridge::resize(int w, int h) { if (widget()) widget()->resize(w, h); }

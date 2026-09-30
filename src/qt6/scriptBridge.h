@@ -17,7 +17,7 @@ public:
     bool isSettings() const;
     Q_INVOKABLE void setSetting(QString key, QJSValue value);
     void setWindowFlags(int flags);
-    Q_INVOKABLE void setAttribute(int attribute, bool enabled = true);
+    Q_INVOKABLE void setAttribute(QJSValue attribute, bool enabled = true);
     Q_INVOKABLE QJSValue parentWidget();
     Q_INVOKABLE void move(int x, int y);
     Q_INVOKABLE void resize(int width, int height);

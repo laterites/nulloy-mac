@@ -45,6 +45,7 @@
 #include <QIcon>
 #include <QLayout>
 #include <QTime>
+#include <QWindow>
 #include <QWindowStateChangeEvent>
 
 #define RESIZE_BORDER 5
@@ -339,6 +340,13 @@ void NMainWindow::mousePressEvent(QMouseEvent *event)
             m_resizePoint = event->pos();
             m_resizeRect = rect();
         } else {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+            // let the window manager move the window (native snapping, Spaces, screens)
+            if (!isMaximized() && windowHandle() && windowHandle()->startSystemMove()) {
+                event->accept();
+                return;
+            }
+#endif
             m_dragActive = true;
             m_dragPoint = event->globalPos() - frameGeometry().topLeft();
         }
